@@ -1,3 +1,4 @@
+import argparse
 from flask import Flask, request, jsonify
 from models.bodyfat_model import BodyFatModel
 from models.churn_model import ChurnModel
@@ -11,16 +12,17 @@ from models.bitcoin_model import BitcoinModel
 from models.spStock_model import SPStockModel
 
 # Crear la instancia del modelo
-model = BodyFatModel('datasets/bodyfat.csv', 'models/bodyfat_model.pkl')
-churn = ChurnModel('datasets/Telco-Customer-Churn.csv', 'models/churn_model.pkl')
-rossmann = RossmanModel('datasets/rossman.csv', 'models/rossman_model.pkl')
-car = CarModel('datasets/car.csv', 'models/car.pkl')
-wine = WineModel('datasets/winequalityN.csv', 'models/wine.pkl')
-stroke = StrokeModel('datasets/healthcare-dataset-stroke-data.csv', 'models/stroke.pkl')
-cirrhosis = CirrhosisModel('datasets/cirrhosis.csv', 'models/cirrhosis.pkl')
-hepatitis = HepatitisModel('datasets/hepatitis.csv', 'models/hepatitis.pkl')
-bitcoin = BitcoinModel('datasets/bitcoin.csv', 'models/bitcoin.pkl')
-spStock = SPStockModel('datasets/spStock.csv', 'models/spStock.pkl')
+model = BodyFatModel('datasets/bodyfat.csv', 'ml/bodyfat_model.pkl')
+churn = ChurnModel('datasets/Telco-Customer-Churn.csv', 'ml/churn_model.pkl')
+rossmann = RossmanModel('datasets/rossman.csv', 'ml/rossman_model.pkl')
+car = CarModel('datasets/car.csv', 'ml/car.pkl')
+wine = WineModel('datasets/winequalityN.csv', 'ml/wine.pkl')
+stroke = StrokeModel('datasets/healthcare-dataset-stroke-data.csv', 'ml/stroke.pkl')
+cirrhosis = CirrhosisModel('datasets/cirrhosis.csv', 'ml/cirrhosis.pkl')
+hepatitis = HepatitisModel('datasets/hepatitis.csv', 'ml/hepatitis.pkl')
+bitcoin = BitcoinModel('datasets/bitcoin.csv', 'ml/bitcoin.pkl')
+spStock = SPStockModel('datasets/spStock.csv', 'ml/spStock.pkl')
+
 app = Flask(__name__)
 
 @app.route('/bodyfat/predict', methods=['POST'])
@@ -104,5 +106,33 @@ def predict_spStock():
     })
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+def main():
+    # Crea un parser
+    parser = argparse.ArgumentParser(description="Entrenamiento de modelo y servidor Flask")
+    
+    # Agrega la flag --train
+    parser.add_argument('--train', action='store_true', help="Indica que se debe entrenar el modelo")
+
+    # Parsea los argumentos
+    args = parser.parse_args()
+
+    # Utiliza la flag
+    if args.train:
+        # Entrena el modelo
+        print("Entrenando modelos...")
+        model.train()
+        churn.train()
+        rossmann.train()
+        car.train()
+        wine.train()
+        stroke.train()
+        cirrhosis.train()
+        hepatitis.train()
+        bitcoin.train()
+        spStock.train()
+        # Inicia el servidor Flask
+    print("Iniciando el servidor Flask...")
+    app.run(port=8000,debug=True)
+
+if __name__ == "__main__":
+    main()
