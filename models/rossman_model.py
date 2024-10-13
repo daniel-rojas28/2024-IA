@@ -1,11 +1,39 @@
 import joblib
 import pandas as pd
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.tsa.seasonal import seasonal_decompose
+import statsmodels.api as sm
 
 class RossmanModel:
     def __init__(self, dataset_path, model_path):
         self.dataset_path = dataset_path
+        self.model_path = model_path
         self.model = None
-        self.load_model(model_path)
+
+    def train(self):
+        dtype_dict = {
+            'StateHoliday': str,
+        }
+        train_data = pd.read_csv(self.dataset_path, dtype=dtype_dict)
+
+        train_data = train_data[train_data['Store'] == 2]
+
+        train_data["Date"]=pd.to_datetime(train_data["Date"])
+        train_data["Sales"]=pd.to_numeric(train_data["Sales"], downcast='float')
+
+        train_data = train_data.sort_values(by='Date')
+        train_data = train_data.groupby('Date')['Sales'].sum().reset_index()
+        train_data = train_data.set_index('Date')
+        y = train_data['Sales'].resample('MS').mean()
+        
+        mod = sm.tsa.statespace.SARIMAX(y,
+                                order=(0, 1, 1),
+                                seasonal_order=(0, 1, 1, 12),
+                                enforce_stationarity=False,
+                                enforce_invertibility=False)
+        results = mod.fit(disp=False)
+        self.model = results
+        joblib.dump(self.model, self.model_path)
 
     def load_model(self, model_path):
         self.model = joblib.load(model_path)
