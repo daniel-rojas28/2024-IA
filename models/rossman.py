@@ -3,12 +3,9 @@ import pandas as pd
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.seasonal import seasonal_decompose
 import statsmodels.api as sm
+from models.model import Model
 
-class RossmanModel:
-    def __init__(self, dataset_path, model_path):
-        self.dataset_path = dataset_path
-        self.model_path = model_path
-        self.model = None
+class RossmanModel(Model):
 
     def train(self):
         dtype_dict = {
@@ -33,10 +30,7 @@ class RossmanModel:
                                 enforce_invertibility=False)
         results = mod.fit(disp=False)
         self.model = results
-        joblib.dump(self.model, self.model_path)
-
-    def load_model(self, model_path):
-        self.model = joblib.load(model_path)
+        self.save_model()
 
     def predict(self, forecasted_date):
         forecast = self.model.get_forecast(steps=100)

@@ -1,17 +1,12 @@
 import joblib
-import itertools
 import pandas as pd
-import numpy as np
 from matplotlib import pyplot as plt
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 import warnings
 import statsmodels.api as sm
+from models.model import Model
 
-class SPStockModel:
-    def __init__(self, dataset_path, model_path):
-        self.dataset_path = dataset_path
-        self.model_path = model_path
-        self.model = None
+class SPStockModel(Model):
 
     def train(self):
         df = pd.read_csv(self.dataset_path)
@@ -42,11 +37,7 @@ class SPStockModel:
         results = mod.fit(disp=False)
 
         self.model = results
-        joblib.dump(self.model, self.model_path)
-
-
-    def load_model(self, model_path):
-        self.model = joblib.load(model_path)
+        self.save_model()
 
     def predict(self, forecasted_date):
         forecast = self.model.get_forecast(steps=100)

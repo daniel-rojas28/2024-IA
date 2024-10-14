@@ -4,16 +4,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestClassifier
+from models.model import Model
 
-
-class CirrhosisModel:
+class CirrhosisModel(Model):
     
-    def __init__(self, dataset_path, model_path):
-        self.dataset_path = dataset_path
-        self.model_path = model_path
-        self.model = None
-        self.types = None
-
     def train(self):
         df = pd.read_csv(self.dataset_path)
         df = df.drop(columns=['ID', 'Status', 'N_Days'])
@@ -41,11 +35,7 @@ class CirrhosisModel:
         rf_model = RandomForestClassifier(random_state=42, n_estimators=100)
         rf_model.fit(X_train, y_train)
         self.model = rf_model
-        joblib.dump(rf_model, self.model_path)
-
-
-    def load_model(self, model_path):
-        self.model = joblib.load(model_path)
+        self.save_model()
 
     def predict(self, input_data):
         input_df = pd.DataFrame([input_data])

@@ -1,34 +1,22 @@
-import argparse
+import os
 from flask import Flask, request, jsonify
-from models.bodyfat_model import BodyFatModel
-from models.churn_model import ChurnModel
-from models.rossman_model import RossmanModel
-from models.car_model import CarModel
-from models.wine_model import WineModel
-from models.stroke_model import StrokeModel
-from models.cirrhosis_model import CirrhosisModel
-from models.hepatitis_model import HepatitisModel
-from models.bitcoin_model import BitcoinModel
-from models.spStock_model import SPStockModel
-
-# Crear la instancia del modelo
-model = BodyFatModel('datasets/bodyfat.csv', 'ml/bodyfat_model.pkl')
-churn = ChurnModel('datasets/Telco-Customer-Churn.csv', 'ml/churn_model.pkl')
-rossmann = RossmanModel('datasets/rossman.csv', 'ml/rossman_model.pkl')
-car = CarModel('datasets/car.csv', 'ml/car.pkl')
-wine = WineModel('datasets/winequalityN.csv', 'ml/wine.pkl')
-stroke = StrokeModel('datasets/healthcare-dataset-stroke-data.csv', 'ml/stroke.pkl')
-cirrhosis = CirrhosisModel('datasets/cirrhosis.csv', 'ml/cirrhosis.pkl')
-hepatitis = HepatitisModel('datasets/hepatitis.csv', 'ml/hepatitis.pkl')
-bitcoin = BitcoinModel('datasets/bitcoin.csv', 'ml/bitcoin.pkl')
-spStock = SPStockModel('datasets/spStock.csv', 'ml/spStock.pkl')
+from models.bodyfat import BodyFatModel
+from models.churn import ChurnModel
+from models.rossman import RossmanModel
+from models.car import CarModel
+from models.wine import WineModel
+from models.stroke import StrokeModel
+from models.cirrhosis import CirrhosisModel
+from models.hepatitis import HepatitisModel
+from models.bitcoin import BitcoinModel
+from models.spStock import SPStockModel
 
 app = Flask(__name__)
 
 @app.route('/bodyfat/predict', methods=['POST'])
 def predict_body_fat():
     input_data = request.json
-    prediction = model.predict(input_data)
+    prediction = bodyfat.predict(input_data)
     return jsonify({
         'prediction': prediction
     })
@@ -105,34 +93,19 @@ def predict_spStock():
         'prediction': prediction
     })
 
-
-def main():
-    # Crea un parser
-    parser = argparse.ArgumentParser(description="Entrenamiento de modelo y servidor Flask")
-    
-    # Agrega la flag --train
-    parser.add_argument('--train', action='store_true', help="Indica que se debe entrenar el modelo")
-
-    # Parsea los argumentos
-    args = parser.parse_args()
-
-    # Utiliza la flag
-    if args.train:
-        # Entrena el modelo
-        print("Entrenando modelos...")
-        model.train()
-        churn.train()
-        rossmann.train()
-        car.train()
-        wine.train()
-        stroke.train()
-        cirrhosis.train()
-        hepatitis.train()
-        bitcoin.train()
-        spStock.train()
-        # Inicia el servidor Flask
-    print("Iniciando el servidor Flask...")
-    app.run(port=8000,debug=True)
-
 if __name__ == "__main__":
-    main()
+    if not os.path.isdir('ml'):
+        os.mkdir(os.path.join(os.path.dirname(__file__), 'ml'))    
+
+        # Crear la instancia del modelo
+    bodyfat = BodyFatModel('datasets/bodyfat.csv')
+    churn = ChurnModel('datasets/churn.csv')
+    rossmann = RossmanModel('datasets/rossman.csv')
+    car = CarModel('datasets/car.csv')
+    wine = WineModel('datasets/wine.csv')
+    stroke = StrokeModel('datasets/stroke.csv')
+    cirrhosis = CirrhosisModel('datasets/cirrhosis.csv')
+    hepatitis = HepatitisModel('datasets/hepatitis.csv')
+    bitcoin = BitcoinModel('datasets/bitcoin.csv')
+    spStock = SPStockModel('datasets/spStock.csv')
+    app.run(debug=True, port=8000)

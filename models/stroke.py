@@ -3,9 +3,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.utils import resample
+from models.model import Model
 
-
-class StrokeModel:
+class StrokeModel(Model):
     types = {
         "gender": {
             "Male": 1,
@@ -34,11 +34,6 @@ class StrokeModel:
             "Unknown": 3
         }
     }
-
-    def __init__(self, dataset_path, model_path):
-        self.dataset_path = dataset_path
-        self.model_path = model_path
-        self.model = None
 
     def train(self):
         data = pd.read_csv(self.dataset_path)
@@ -76,10 +71,7 @@ class StrokeModel:
         model.fit(X_data, y_data)
 
         self.model = model
-        joblib.dump(model, self.model_path)
-
-    def load_model(self, model_path):
-        self.model = joblib.load(model_path)
+        self.save_model()
 
     def predict(self, input_data):
         input_df = pd.DataFrame([input_data])

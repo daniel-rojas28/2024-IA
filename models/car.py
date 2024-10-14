@@ -1,16 +1,8 @@
-import joblib
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import LinearRegression
+from models.model import Model
 
-
-class CarModel:
-    def __init__(self, dataset_path, model_path):
-        self.dataset_path = dataset_path
-        self.model_path = model_path
-        self.model = None
-
+class CarModel(Model):
 
     def train(self):
         data = pd.read_csv(self.dataset_path)
@@ -31,11 +23,7 @@ class CarModel:
         model = LinearRegression()
         model.fit(X, y)
         self.model = model
-        joblib.dump(model, self.model_path)
-
-
-    def load_model(self, model_path):
-        self.model = joblib.load(model_path)
+        self.save_model()
 
     def predict(self, input_data):
         input_df = pd.DataFrame([input_data])

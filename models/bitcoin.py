@@ -6,15 +6,11 @@ from matplotlib import pyplot as plt
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 import warnings
 import statsmodels.api as sm
+from models.model import Model
 
 warnings.filterwarnings("ignore")
 
-class BitcoinModel:
-    def __init__(self, dataset_path, model_path):
-        self.dataset_path = dataset_path
-        self.model_path = model_path
-        self.model = None
-
+class BitcoinModel(Model):
     def train(self):
         data = pd.read_csv(self.dataset_path)
         data['Date'] = pd.to_datetime(data['Date'])
@@ -31,11 +27,8 @@ class BitcoinModel:
                                 enforce_stationarity=False,
                                 enforce_invertibility=False)
         model = mod.fit(disp=False)
-        self.model = model  
-        joblib.dump(model, self.model_path)
-
-    def load_model(self, model_path):
-        self.model = joblib.load(model_path)
+        self.model = model
+        self.save_model()
 
     def predict(self, forecasted_date):
         forecast = self.model.get_forecast(steps=100)

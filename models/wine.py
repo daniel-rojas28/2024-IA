@@ -5,13 +5,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
+from models.model import Model
 
-class WineModel:
-    def __init__(self, dataset_path, model_path):
-        self.dataset_path = dataset_path
-        self.model_path = model_path
-        self.model = None
-    
+class WineModel(Model):
+ 
     def train(self):
         wine_data = pd.read_csv(self.dataset_path)
 
@@ -32,11 +29,8 @@ class WineModel:
         model.fit(X_train, y_train)
 
         self.model = model
-        joblib.dump(model, self.model_path)
+        self.save_model()
 
-
-    def load_model(self, model_path):
-        self.model = joblib.load(model_path)
 
     def predict(self, input_data):
         input_df = pd.DataFrame([input_data])

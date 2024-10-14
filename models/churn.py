@@ -3,13 +3,10 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from models.model import Model
 
-class ChurnModel:
-    def __init__(self, dataset_path, model_path):
-        self.dataset_path = dataset_path
-        self.model_path = model_path
-        self.model = None
-    
+class ChurnModel(Model):
+
     def train(self):
         data = pd.read_csv(self.dataset_path)
 
@@ -34,11 +31,7 @@ class ChurnModel:
         log_reg.fit(X_train, y_train)
 
         self.model = log_reg
-        joblib.dump(self.model, self.model_path)
-
-
-    def load_model(self, model_path):
-        self.model = joblib.load(model_path)
+        self.save_model()
 
     def predict(self, input_data):
         input_df = pd.DataFrame([input_data])

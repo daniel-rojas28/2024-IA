@@ -1,9 +1,9 @@
 import joblib
 import pandas as pd
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
-
-class HepatitisModel:
+from models.model import Model
+class HepatitisModel(Model):
     category_map = {
         0: "0=Blood Donor",
         1: "1=Hepatitis",
@@ -11,10 +11,6 @@ class HepatitisModel:
         3: "3=Cirrhosis",
         4: "0s=suspect Blood Donor"
     }
-    def __init__(self, dataset_path, model_path):
-        self.dataset_path = dataset_path
-        self.model_path = model_path
-        self.model = None
 
     def train(self):
         df = pd.read_csv(self.dataset_path)
@@ -40,10 +36,7 @@ class HepatitisModel:
         knn.fit(X_train, y_train)
 
         self.model = knn
-        joblib.dump(knn, self.model_path)
-
-    def load_model(self, model_path):
-        self.model = joblib.load(model_path)
+        self.save_model()
 
     def predict(self, input_data):
         input_df = pd.DataFrame([input_data])
