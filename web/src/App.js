@@ -4,8 +4,10 @@ import Circle from './Circle';
 import Background from './Background';
 import Spinner from './Spinner'; // Asegúrate de tener este componente
 import './index.css';
-import { bodyfatBody, churnBody, rossmanBody, bitcoinBody, spStockBody, carBody, hepatitisBody, wineBody, strokeBody, cirrhosisBody } from './requests'
-
+import { 
+  bodyfatBody, churnBody, rossmanBody, bitcoinBody, spStockBody, 
+  carBody, hepatitisBody, wineBody, strokeBody, cirrhosisBody 
+} from './requests';
 
 function App() {
   const [transcript, setTranscript] = useState('Usa el botón o la tecla espacio para activar el micrófono...!!');
@@ -28,13 +30,13 @@ function App() {
 
   const funciones = {
     'ventas': () => callApi('/rossman/predict', rossmanBody),
-    'cirrosis': () => callApi('/cirrhosis/predict',cirrhosisBody),
+    'cirrosis': () => callApi('/cirrhosis/predict', cirrhosisBody),
     'masa corporal': () => callApi('/bodyfat/predict', bodyfatBody),
     'hepatitis': () => callApi('/hepatitis/predict', hepatitisBody),
     'cerebrovascular': () => callApi('/stroke/predict', strokeBody),
     'compañía celular': () => callApi('/churn/predict', churnBody),
     'vino': () => callApi('/wine/predict', wineBody),
-    'acciones': () => callApi('/spStock/predict', ),
+    'acciones': () => callApi('/spStock/predict'),
     'automóvil': () => callApi('/car/predict', carBody),
     'bitcoin': () => callApi('/bitcoin/predict', bitcoinBody),
   };
@@ -90,10 +92,12 @@ function App() {
   recognition.onresult = (event) => {
     const result = event.results[event.results.length - 1][0].transcript.toLowerCase();
     console.log(result);
+
     if (awaitingKeyword && result.includes('hola')) {
       setIsListening(true);
       setAwaitingKeyword(false);
       setTranscript('Escuchando...!!');
+      setNotification(''); // Limpiar notificación
     } else if (!awaitingKeyword) {
       setTranscript(result);
 
@@ -110,7 +114,7 @@ function App() {
 
   useEffect(() => {
     if (notification) {
-      const timer = setTimeout(() => setNotification(''), 2000);
+      const timer = setTimeout(() => setNotification(''), 5000);
       return () => clearTimeout(timer);
     }
   }, [notification]);
@@ -118,18 +122,18 @@ function App() {
   return (
     <div className="App">
       <Background />
-      <button className="button microphone-button" title="Activar el micrófono" onClick={handleActivation}>
+      <button className="button microphone-button" onClick={handleActivation}>
         {isActive ? 'Desactivar Micrófono' : 'Activar Micrófono'}
       </button>
-      <button className="button commands-button" title="Ver los comandos de voz" onClick={toggleCommands}>
+      <button className="button commands-button" onClick={toggleCommands}>
         Comandos
       </button>
       <h1 className="title">E.F.R.E.N</h1>
       <p className="efren">Enabled Functionality for Rapid Exploration of Numbers</p>
       <div className="container">
         <Circle isActive={isListening || loading} />
-        {loading ? <div><Spinner /><p>{transcript}</p></div> : <p id="text-output">{transcript}</p>}
-        {notification && <div className="notification">{notification}</div>}
+        {loading ? <Spinner /> : <p id="text-output">{transcript}</p>}
+        {notification && <p className="notification">Respuesta: {notification}</p>}
       </div>
 
       {showCommands && (

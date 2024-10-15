@@ -1,144 +1,68 @@
-/* Reseteo básico */
+/* Reseteo y Variables */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+:root {
+  --primary: #2ecc71;
+  --primary-hover: #24a158;
+  --secondary: #27ae60;
+  --bg: #0d1117;
+  --modal-bg: #252525;
+  --text: #e9ecef;
+  --muted: #a9a9a9;
+  --btn-bg: #303030d8;
+  --btn-hover: #464646d8;
+}
+
+/* Estilos Generales */
 body {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #0d1117;
-  font-family: 'Roboto Mono', monospace; /* Fuente más tecnológica */
-  color: #e9ecef;
+  background: var(--bg);
+  font-family: 'Roboto Mono', monospace;
+  color: var(--text);
 }
 
-.App {
+.App,
+.container {
   text-align: center;
   width: 100%;
 }
 
-/* Título del asistente */
+.background-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
 .title {
   margin-top: -120px;
   font-size: 3.75rem;
-  color: #2ecc71;
+  color: var(--primary);
 }
 
 .efren {
   font-size: 0.6rem;
-  background-color: #2ecc71;
+  background: var(--primary);
   color: black;
   width: 320px;
   margin: auto;
   border-radius: 2px;
 }
 
-/* Contenedor general */
-.container {
-  margin-top: 50px;
-  text-align: center;
-  position: relative;
-}
-
-/* Círculo animado */
-.circle-wrapper {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  cursor: pointer;
-  margin: 0 auto;
-  transition: transform 0.4s ease;
-}
-
-.outer-ring {
-  width: 100%;
-  height: 100%;
-  border: 3px solid #2ecc71;
-  border-radius: 50%;
-  animation: rotate 6s linear infinite;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.inner-ring {
-  width: 80%;
-  height: 80%;
-  border: 2px dashed #27ae60;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: pulse 2s infinite;
-}
-
-.pulse {
-  width: 40px;
-  height: 40px;
-  background-color: #2ecc71;
-  border-radius: 50%;
-  box-shadow: 0 0 15px rgba(46, 204, 113, 0.8);
-  animation: pulse-effect 1.5s infinite;
-}
-
-.circle-wrapper.active {
-  transform: scale(1.2);
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-@keyframes pulse-effect {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.3);
-    opacity: 0.6;
-  }
-}
-
-p {
-  font-size: 1.4rem;
-  color: #a9a9a9;
-}
-
-#text-output {
-  margin-top: 50px;
-}
-
-.notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  z-index: 1000; /* Asegura que la notificación esté encima de otros elementos */
-  transition: opacity 0.5s;
-}
-
-.button {
+/* Botones y Notificaciones */
+.button,
+.microphone-button,
+.commands-button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -148,7 +72,7 @@ p {
   transition: background-color 0.3s, transform 0.3s;
 }
 
-.button:hover{
+.button:hover {
   transform: scale(1.05);
 }
 
@@ -156,36 +80,133 @@ p {
   position: absolute;
   top: 50px;
   left: 50px;
-  background-color: #2ecc71;
+  background: var(--primary);
 }
 
 .microphone-button:hover {
-  background-color: #24a158;
+  background: var(--primary-hover);
 }
-
-.microphone-button:focus {
-  outline: none;
-}
-
 
 .commands-button {
   position: absolute;
   top: 50px;
   right: 50px;
-  background-color: #303030d8;
-  color: white;
+  background: var(--btn-bg);
 }
 
 .commands-button:hover {
-  background-color: #464646d8;
+  background: var(--btn-hover);
 }
 
+.notification {
+  margin-top: 20px;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.notification-hidden {
+  opacity: 0;
+}
+
+/* Círculo Animado */
+.circle-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  margin-top: 40px;
+  cursor: pointer;
+  transition: transform 0.4s ease;
+}
+
+.outer-ring,
+.inner-ring {
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.outer-ring {
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--primary);
+  animation: rotate 6s linear infinite;
+}
+
+.inner-ring {
+  width: 80%;
+  height: 80%;
+  border: 2px dashed var(--secondary);
+  animation: pulse 2s infinite;
+}
+
+.pulse {
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(46, 204, 113, 0.8);
+  animation: pulse-effect 1.5s infinite;
+}
+
+.circle-wrapper.active {
+  transform: scale(1.2);
+}
+
+/* Animaciones */
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-effect {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 0.6;
+  }
+}
+
+p {
+  font-size: 1.4rem;
+  color: var(--muted);
+}
+
+#text-output {
+  margin-top: 50px;
+}
+
+/* Modal de Comandos */
 .commands-modal {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgb(37, 37, 37);
+  background: var(--modal-bg);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -197,38 +218,37 @@ p {
 }
 
 .commands-modal ul {
-  padding: 0;
   padding-left: 20px;
-  margin: 20px;
+  margin: 20px 0;
 }
 
 .commands-modal ul li {
-  padding-top:10px;
+  padding-top: 10px;
   text-align: left;
 }
-
 
 .commands-modal button {
   margin-top: 10px;
   margin-right: 20px;
-  background-color: transparent;
+  background: transparent;
   color: white;
   border: none;
   cursor: pointer;
 }
 
+/* Botón de Cierre */
 .close-button {
   position: absolute;
-  top: 10px;  /* Ajusta según sea necesario */
-  right: 10px; /* Ajusta según sea necesario */
+  top: 10px;
+  right: 10px;
   background: none;
   border: none;
-  color: white; /* Color de la "X" */
-  font-size: 24px; /* Tamaño de la "X" */
+  color: white;
+  font-size: 24px;
   cursor: pointer;
-  outline: none; /* Sin contorno */
+  outline: none;
 }
 
 .close-button:hover {
-  color: #27ae60; /* Cambia el color al pasar el mouse, si deseas */
+  color: var(--secondary);
 }

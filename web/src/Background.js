@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import './background.css'; // Importa los estilos para el fondo
+import './index.css'; // Importa los estilos para el fondo
 
 const Background = () => {
   useEffect(() => {
