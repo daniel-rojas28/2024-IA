@@ -8,6 +8,7 @@ import {
   bodyfatBody, churnBody, rossmanBody, bitcoinBody, spStockBody, 
   carBody, hepatitisBody, wineBody, strokeBody, cirrhosisBody 
 } from './requests';
+import Camera from './Camera'; // Asegúrate de importar tu componente de cámara
 
 function App() {
   const [transcript, setTranscript] = useState('Usa el botón o la tecla espacio para activar el micrófono...!!');
@@ -16,8 +17,9 @@ function App() {
   const [isListening, setIsListening] = useState(false);
   const [awaitingKeyword, setAwaitingKeyword] = useState(true);
   const [showCommands, setShowCommands] = useState(false);
-  const [loading, setLoading] = useState(false); // Estado para mostrar el spinner
+  const [loading, setLoading] = useState(false); 
   const recognitionRef = useRef(null);
+  const [photo, setPhoto] = useState(null); // Para almacenar la foto tomada/subida
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = recognitionRef.current || new SpeechRecognition();
@@ -30,7 +32,7 @@ function App() {
 
   const funciones = {
     'ventas': () => callApi('/rossman/predict', rossmanBody),
-    'cirrosis': () => callApi('/cirrhosis/predict', cirrhosisBody),
+    'cirrosis': () => callApi('/cirrosis/predict', cirrhosisBody),
     'masa corporal': () => callApi('/bodyfat/predict', bodyfatBody),
     'hepatitis': () => callApi('/hepatitis/predict', hepatitisBody),
     'cerebrovascular': () => callApi('/stroke/predict', strokeBody),
@@ -42,8 +44,7 @@ function App() {
   };
 
   const callApi = async (endpoint, data) => {
-    setTranscript('Procesando información...!!'); // Cambia el texto antes de la API
-    setLoading(true); // Activa el spinner
+    setLoading(true); 
 
     try {
       const response = await axios.post(`${apiBaseUrl}${endpoint}`, data);
@@ -52,7 +53,7 @@ function App() {
       setNotification('Error al ejecutar la función.');
       console.error('Error al llamar a la API:', error);
     } finally {
-      setLoading(false); // Desactiva el spinner al terminar
+      setLoading(false); 
       resetState();
       setTranscript('Diga "Efrén" para empezar a hablar...!!');
     }
@@ -119,6 +120,10 @@ function App() {
     }
   }, [notification]);
 
+  const handlePhotoTaken = (imageDataUrl) => {
+    setPhoto(imageDataUrl);
+  };
+
   return (
     <div className="App">
       <Background />
@@ -154,6 +159,12 @@ function App() {
           </ul>
         </div>
       )}
+
+      <div className="camera-wrapper">
+        <Camera onPhotoTaken={handlePhotoTaken} />
+      </div>
+
+      
     </div>
   );
 }

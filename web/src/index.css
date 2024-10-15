@@ -79,7 +79,7 @@ body {
 .microphone-button {
   position: absolute;
   top: 50px;
-  left: 50px;
+  right: 50px;
   background: var(--primary);
 }
 
@@ -89,7 +89,7 @@ body {
 
 .commands-button {
   position: absolute;
-  top: 50px;
+  top: 100px;
   right: 50px;
   background: var(--btn-bg);
 }
@@ -251,4 +251,62 @@ p {
 
 .close-button:hover {
   color: var(--secondary);
+}
+
+.camera-container {
+  position: absolute;
+  left: 20px;
+  top: 180px;
+  transform: translateY(-50%);
+  width: 300px;
+  height: 300px;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.video-stream {
+  width: 100%;
+  height: auto;
+}
+
+.captured-photo {
+  width: 100%;
+  height: auto;
+}
+
+.upload-button-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.upload-button-wrapper input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.upload-button-wrapper button, 
+.camera-buttons button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  margin: 0 5px;
+}
+
+.upload-button-wrapper button:hover {
+  background-color: #45a049;
 }
