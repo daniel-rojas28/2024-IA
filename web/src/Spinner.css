@@ -1,0 +1,21 @@
+.spinner {
+    position: relative;
+    border: 6px solid rgba(36, 36, 36, 0.3); /* Color del borde opaco */
+    border-top: 6px solid #2ecc71; /* Cambiar este color al del asistente */
+    border-radius: 50%;
+    width: 190px; 
+    height: 190px;   
+    margin-top: -100px;
+    margin-left: 190px;
+    animation: spin 1s linear infinite; /* Animación de rotación */
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg); /* Comienza en la posición original */
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg); /* Rota 360 grados */
+    }
+  }
+  
