@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import AWS from 'aws-sdk';
 import Circle from './Circle';
 import Background from './Background';
 import Spinner from './Spinner'; // Asegúrate de tener este componente
@@ -10,6 +11,15 @@ import {
 } from './requests';
 import Camera from './Camera'; // Asegúrate de importar tu componente de cámara
 
+// Configurar AWS Rekognition con las credenciales del archivo .env
+AWS.config.update({
+  accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+  region: process.env.REACT_APP_AWS_DEFAULT_REGION
+});
+
+const rekognition = new AWS.Rekognition();
+
 function App() {
   const [transcript, setTranscript] = useState('Usa el botón o la tecla espacio para activar el micrófono...!!');
   const [isActive, setIsActive] = useState(false);
@@ -17,9 +27,10 @@ function App() {
   const [isListening, setIsListening] = useState(false);
   const [awaitingKeyword, setAwaitingKeyword] = useState(true);
   const [showCommands, setShowCommands] = useState(false);
-  const [loading, setLoading] = useState(false); 
-  const recognitionRef = useRef(null);
+  const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null); // Para almacenar la foto tomada/subida
+  const [emotion, setEmotion] = useState(null); // Para almacenar la emoción detectada
+  const recognitionRef = useRef(null);
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = recognitionRef.current || new SpeechRecognition();
@@ -44,7 +55,7 @@ function App() {
   };
 
   const callApi = async (endpoint, data) => {
-    setLoading(true); 
+    setLoading(true);
 
     try {
       const response = await axios.post(`${apiBaseUrl}${endpoint}`, data);
@@ -53,7 +64,7 @@ function App() {
       setNotification('Error al ejecutar la función.');
       console.error('Error al llamar a la API:', error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
       resetState();
       setTranscript('Diga "Efrén" para empezar a hablar...!!');
     }
@@ -120,8 +131,43 @@ function App() {
     }
   }, [notification]);
 
-  const handlePhotoTaken = (imageDataUrl) => {
+  const handlePhotoTaken = async (imageDataUrl) => {
     setPhoto(imageDataUrl);
+    console.log("Foto tomada o subida:", imageDataUrl); // Imprime la URL de la imagen en la consola
+    await detectDominantEmotionFromLocalImage(imageDataUrl);
+  };
+
+  const detectDominantEmotionFromLocalImage = async (imageDataUrl) => {
+    try {
+      const response = await fetch(imageDataUrl);
+      const blob = await response.blob();
+      const arrayBuffer = await blob.arrayBuffer();
+      const params = {
+        Image: {
+          Bytes: Buffer.from(arrayBuffer) // Cambiar esto si estás en el navegador
+        },
+        Attributes: ['ALL']
+      };
+
+      const data = await rekognition.detectFaces(params).promise();
+      let dominantEmotion = null;
+      let maxConfidence = 0;
+
+      // Buscar la emoción con la confianza más alta
+      data.FaceDetails.forEach((faceDetail) => {
+        faceDetail.Emotions.forEach((emotion) => {
+          if (emotion.Confidence > maxConfidence) {
+            maxConfidence = emotion.Confidence;
+            dominantEmotion = emotion.Type;
+          }
+        });
+      });
+
+      setEmotion(dominantEmotion ? dominantEmotion : 'No se pudo detectar ninguna emoción');
+    } catch (err) {
+      console.error("Error al detectar emociones:", err);
+      setEmotion('Error al detectar emociones');
+    }
   };
 
   return (
@@ -164,9 +210,10 @@ function App() {
         <Camera onPhotoTaken={handlePhotoTaken} />
       </div>
 
-      
+      {emotion && <p>Emoción Detectada: {emotion}</p>}
     </div>
   );
 }
 
 export default App;
+

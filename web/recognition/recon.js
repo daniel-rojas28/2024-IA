@@ -52,6 +52,6 @@ export const detectDominantEmotionFromLocalImage = async (imagePath) => {
 };
 
 // Ejemplo de uso:
-// detectDominantEmotionFromLocalImage('img/test.jpg')
-//   .then(dominantEmotion => console.log("Status:", dominantEmotion))
-//   .catch(err => console.error(err));
+detectDominantEmotionFromLocalImage('img/test.jpg')
+.then(dominantEmotion => console.log("Status:", dominantEmotion))
+.catch(err => console.error(err));

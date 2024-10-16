@@ -19,16 +19,30 @@ function Camera({ onPhotoTaken }) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       videoRef.current.srcObject = stream;
-      videoRef.current.play();
+
+      // Espera a que el video esté listo antes de reproducirlo
+      videoRef.current.addEventListener('loadedmetadata', () => {
+        videoRef.current.play().catch((error) => {
+          console.error('Error al reproducir el video:', error);
+        });
+      });
     } catch (error) {
       console.error('Error al acceder a la cámara:', error);
     }
   };
 
-  // Tomar foto desde la cámara
+  // Tomar foto desde la cámara, usando el tamaño original del video
   const handleTakePhoto = () => {
+    // Configura el tamaño del canvas al tamaño del video
+    const videoWidth = videoRef.current.videoWidth;
+    const videoHeight = videoRef.current.videoHeight;
+    canvasRef.current.width = videoWidth;
+    canvasRef.current.height = videoHeight;
+
     const context = canvasRef.current.getContext('2d');
-    context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+    context.drawImage(videoRef.current, 0, 0, videoWidth, videoHeight);
+
+    // Obtiene la imagen capturada en su tamaño original
     const photoData = canvasRef.current.toDataURL('image/jpeg');
     setCapturedPhoto(photoData);
     onPhotoTaken(photoData);
@@ -64,7 +78,7 @@ function Camera({ onPhotoTaken }) {
       {!isCameraOpen && capturedPhoto && (
         <img src={capturedPhoto} alt="Captured" className="captured-photo" />
       )}
-      <canvas ref={canvasRef} style={{ display: 'none' }} width="300" height="400" />
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
 
       <div className="camera-buttons">
         {isCameraOpen ? (
@@ -82,6 +96,7 @@ function Camera({ onPhotoTaken }) {
             accept="image/*" 
             id="fileInput" 
             onChange={handlePhotoUpload} 
+            style={{ display: 'none' }} // Oculta el input de archivo
           />
         </div>
       </div>
@@ -90,3 +105,5 @@ function Camera({ onPhotoTaken }) {
 }
 
 export default Camera;
+
+
