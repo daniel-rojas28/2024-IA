@@ -11,7 +11,12 @@ from models.cirrhosis import CirrhosisModel
 from models.hepatitis import HepatitisModel
 from models.bitcoin import BitcoinModel
 from models.spStock import SPStockModel
+from recon import detect_dominant_emotion
+from dotenv import load_dotenv
+import base64
 
+# Cargar las variables de entorno desde el archivo .env
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
@@ -95,6 +100,50 @@ def predict_spStock():
         'prediction': prediction
     })
 
+@app.route('/detect-emotion', methods=['POST'])
+def detect_emotion():
+    image_bytes = None
+    
+    # Intentar obtener la imagen como multipart/form-data
+    if 'image' in request.files:
+        file = request.files['image']
+        if file.filename == '':
+            return jsonify({'error': 'El archivo está vacío'}), 400
+
+        # Leer la imagen como bytes
+        image_bytes = file.read()
+    
+    # Intentar obtener la imagen como base64 en JSON
+    elif request.is_json:
+        data = request.get_json()
+        if data and 'image' in data:
+            # Obtener la imagen en formato base64 y eliminar el prefijo
+            image_base64 = data['image'].split(',')[1]
+
+            # Decodificar la imagen de base64 a bytes
+            try:
+                image_bytes = base64.b64decode(image_base64)
+            except Exception as e:
+                return jsonify({'error': 'Error al decodificar la imagen'}), 400
+    
+    # Intentar obtener la imagen como base64 en request.form
+    elif 'image' in request.form:
+        # Obtener la imagen en formato base64 y eliminar el prefijo
+        image_base64 = request.form['image'].split(',')[1]
+
+        # Decodificar la imagen de base64 a bytes
+        try:
+            image_bytes = base64.b64decode(image_base64)
+        except Exception as e:
+            return jsonify({'error': 'Error al decodificar la imagen'}), 400
+
+    else:
+        return jsonify({'error': 'Formato de solicitud no soportado'}), 400
+
+    # Detectar la emoción predominante
+    dominant_emotion = detect_dominant_emotion(image_bytes)
+
+    return jsonify({'dominant_emotion': dominant_emotion})
 if __name__ == "__main__":
     if not os.path.isdir('ml'):
         os.mkdir(os.path.join(os.path.dirname(__file__), 'ml'))    
