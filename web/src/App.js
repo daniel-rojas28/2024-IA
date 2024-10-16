@@ -133,40 +133,24 @@ function App() {
 
   const handlePhotoTaken = async (imageDataUrl) => {
     setPhoto(imageDataUrl);
-    console.log("Foto tomada o subida:", imageDataUrl); // Imprime la URL de la imagen en la consola
-    await detectDominantEmotionFromLocalImage(imageDataUrl);
+    await uploadImage(imageDataUrl);
   };
 
-  const detectDominantEmotionFromLocalImage = async (imageDataUrl) => {
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+  
     try {
-      const response = await fetch(imageDataUrl);
-      const blob = await response.blob();
-      const arrayBuffer = await blob.arrayBuffer();
-      const params = {
-        Image: {
-          Bytes: Buffer.from(arrayBuffer) // Cambiar esto si estás en el navegador
-        },
-        Attributes: ['ALL']
-      };
-
-      const data = await rekognition.detectFaces(params).promise();
-      let dominantEmotion = null;
-      let maxConfidence = 0;
-
-      // Buscar la emoción con la confianza más alta
-      data.FaceDetails.forEach((faceDetail) => {
-        faceDetail.Emotions.forEach((emotion) => {
-          if (emotion.Confidence > maxConfidence) {
-            maxConfidence = emotion.Confidence;
-            dominantEmotion = emotion.Type;
-          }
-        });
+      const response = await fetch(`${apiBaseUrl}/detect-emotion`, {
+        method: 'POST',
+        body: formData,
       });
-
-      setEmotion(dominantEmotion ? dominantEmotion : 'No se pudo detectar ninguna emoción');
-    } catch (err) {
-      console.error("Error al detectar emociones:", err);
-      setEmotion('Error al detectar emociones');
+  
+      const data = await response.json();
+      console.log('Emoción predominante:', data.dominant_emotion);
+      setEmotion(data.dominant_emotion);
+    } catch (error) {
+      console.error('Error al enviar la imagen:', error);
     }
   };
 
