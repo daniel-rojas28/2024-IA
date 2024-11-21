@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import AWS from 'aws-sdk';
 import Circle from './Circle';
 import Background from './Background';
 import Spinner from './Spinner'; // Asegúrate de tener este componente
@@ -10,15 +9,6 @@ import {
   carBody, hepatitisBody, wineBody, strokeBody, cirrhosisBody 
 } from './requests';
 import Camera from './Camera'; // Asegúrate de importar tu componente de cámara
-
-// Configurar AWS Rekognition con las credenciales del archivo .env
-AWS.config.update({
-  accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-  region: process.env.REACT_APP_AWS_DEFAULT_REGION
-});
-
-const rekognition = new AWS.Rekognition();
 
 function App() {
   const [transcript, setTranscript] = useState('Usa el botón o la tecla espacio para activar el micrófono...!!');
